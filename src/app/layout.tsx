@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ViewTransitions } from 'next-view-transitions'
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { RootProvider } from 'fumadocs-ui/provider/next';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +26,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ViewTransitions>
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        > 
+          <ThemeProvider 
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+          >
+            
+            <RootProvider>{children}</RootProvider>
+          </ThemeProvider>
       </body>
     </html>
+    </ViewTransitions>
   );
 }
