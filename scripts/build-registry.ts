@@ -39,16 +39,18 @@ function convertImportsToRelative(content: string, sourcePath: string, targetPat
     const pathParts = targetPath.split('/').filter(Boolean);
     const srcIndex = pathParts.indexOf('src');
     
-    // If no 'src' found, try without 'src' prefix (target might be "/components/ghostui/...")
-    let depth: number;
+    // Target should always have 'src' prefix now
     if (srcIndex === -1) {
-        // Target is like "/components/ghostui/ai-input-02.tsx"
-        // We need to go up to src level, so depth = pathParts.length - 1 (excluding filename)
-        depth = pathParts.length - 1;
-    } else {
-        // Target is like "/src/components/ghostui/ai-input-02.tsx"
-        depth = pathParts.length - srcIndex - 2; // -2 for 'src' itself and the filename
+        // Fallback: if no src found, assume it's at src level
+        return content;
     }
+    
+    // Calculate depth from file to src root
+    // Example: src/components/ghostui/btn-02.tsx
+    // pathParts: ['src', 'components', 'ghostui', 'btn-02.tsx']
+    // srcIndex: 0, depth = pathParts.length - srcIndex - 2 = 4 - 0 - 2 = 2
+    // So we need 2 levels up: ../../ to get to src root
+    const depth = pathParts.length - srcIndex - 2; // -2 for 'src' itself and the filename
     
     if (depth < 0) return content;
     
@@ -76,7 +78,7 @@ const getComponentFiles = async (files: File[], registryType: string) => {
             let fileContent = await fs.readFile(filePath, "utf-8");
             
             const fileName = normalizedPath.split('/').pop() || '';
-            const targetPath = `/components/ghostui/${fileName}`;
+            const targetPath = `src/components/ghostui/${fileName}`; // Add 'src/' prefix
             
             // Convert @/ imports to relative paths based on TARGET location
             fileContent = convertImportsToRelative(fileContent, normalizedPath, targetPath);
@@ -99,17 +101,15 @@ const getComponentFiles = async (files: File[], registryType: string) => {
         const getTargetPath = (type: string) => {
             switch (type) {
                 case "registry:hook":
-                    return `/hooks/${fileName}`;
+                    return `src/hooks/${fileName}`; // Add 'src/' prefix
                 case "registry:lib":
-                    return `/lib/${fileName}`;
+                    return `src/lib/${fileName}`; // Add 'src/' prefix
                 case "registry:block":
-                    return `/blocks/${fileName}`;
+                    return `src/blocks/${fileName}`; // Add 'src/' prefix
                 default:
-                    return `/components/ghostui/${fileName}`;
+                    return `src/components/ghostui/${fileName}`; // Add 'src/' prefix
             }
         };
-        
-
         
         const fileType = typeof file === 'string' ? registryType : (file.type || registryType);
         const targetPath = typeof file === 'string' ? getTargetPath(registryType) : (file.target || getTargetPath(fileType));
