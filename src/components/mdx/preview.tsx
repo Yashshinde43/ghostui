@@ -15,9 +15,27 @@ interface PreviewProps {
   isBlock?: boolean;
 }
 
-const prePath = process.env.NEXT_PUBLIC_VERCEL_URL || process.env.VERCEL_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL || process.env.VERCEL_URL}`
-  : "https://ghostui-seven.vercel.app";
+// Use production URL for component registry, or custom env var, or fallback
+const getProductionUrl = () => {
+  // Check for custom production URL env var first
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+  
+  // Check if we're in production and use production URL
+  if (process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' && process.env.NEXT_PUBLIC_VERCEL_URL) {
+    // Only use VERCEL_URL if it matches production domain pattern
+    const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_URL;
+    if (vercelUrl.includes('ghostui-seven.vercel.app') || !vercelUrl.includes('-')) {
+      return `https://${vercelUrl}`;
+    }
+  }
+  
+  // Always default to production URL for component registry
+  return "https://ghostui-seven.vercel.app";
+};
+
+const prePath = process.env.NEXT_PUBLIC_SITE_URL || "https://ghostui-seven.vercel.app";
 
 export function Preview({
   children,
