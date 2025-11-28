@@ -30,8 +30,11 @@ const previewClient = ({ link, prePath, isBlock = false }: { link: string, prePa
   }
 
   const handleTerminalClick = () => {
-    const [folder, filename] = getFileName().split('/');
-    const COPY = `npx shadcn@latest add ${prePath}/r/${folder}/${filename ? filename : folder}`;
+    const [folder, filename] = link.split('/');
+    // Extract the component name (e.g., "ai-input-02" from "ai-input/ai-input-02")
+    const componentName = filename || folder;
+    // Registry files are stored as {componentName}.json in /r/ directory
+    const COPY = `npx shadcn@latest add ${prePath}/r/${componentName}.json`;
     navigator.clipboard.writeText(COPY);
     setIsTerminalCopied(true);
     setTimeout(() => {
