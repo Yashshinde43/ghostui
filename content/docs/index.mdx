@@ -1,7 +1,115 @@
 ---
-title: Hello World
+title: Installation
+description: Getting started with Ghost UI
+icon: ListStart
 ---
 
-## Introduction
+### 1. Install utilities
 
-I love Anime.
+
+All components use [Tailwind CSS v4](https://tailwindcss.com/docs/installation/framework-guides/nextjs), so ensure it's installed in your project.
+Many components also use the `cn` utility function—install it with the following command:
+
+<Tabs items={["bun", "npx", "pnpm"]}>
+ 
+```bash tab="bun"
+bunx shadcn@latest add https://ghostui.vercel.app/r/utils.json 
+```
+ 
+```bash tab="npx"
+npx shadcn@latest add https://ghostui.vercel.app/r/utils.json
+```
+
+```bash tab="pnpm"
+pnpm dlx shadcn@latest add https://ghostui.vercel.app/r/utils.json
+```
+
+</Tabs>
+
+### 2. That's it 🎉
+
+We use [lucide-icons](https://lucide.dev/guide/installation) for most components that include icons, along with some [shadcn/ui](https://ui.shadcn.com/) components. These dependencies will be automatically installed when using the CLI.
+
+For example to add `btn-01` to your project, it will be easy as:
+
+<Tabs items={["bun", "npx", "pnpm"]}>
+ 
+```bash tab="bun"
+bunx shadcn@latest add https://ghostui.vercel.app/r/buttons/btn-01.json
+```
+ 
+```bash tab="npx"
+npx shadcn@latest add https://ghostui.vercel.app/r/buttons/btn-01.json
+```
+
+```bash tab="pnpm"
+pnpm dlx shadcn@latest add https://ghostui.vercel.app/r/buttons/btn-01.json
+```
+
+</Tabs>
+
+_While we provide a convenient 'copy' button for the code, we strongly recommend using the CLI for installing components, as it ensures all necessary files are included._
+
+Add to your page and it works!
+
+```jsx
+import Btn01 from "@/components/ghostui/buttons/btn-01";
+
+export default function Page() {
+    return <Btn01>Get Started</Btn01>;
+}
+```
+
+### 3. Blocks
+
+Blocks are a set of components to make a complete blocks, they contain multiples files. To install them it is mandatory to use the `cli`. For example if you'd like to install an AI input block:
+
+<Tabs items={["bun", "npx", "pnpm"]}>
+ 
+```bash tab="bun"
+bunx shadcn@latest add https://ghostui.vercel.app/r/ai-input/ai-input-01.json
+```
+ 
+```bash tab="npx"
+npx shadcn@latest add https://ghostui.vercel.app/r/ai-input/ai-input-01.json
+```
+
+```bash tab="pnpm"
+pnpm dlx shadcn@latest add https://ghostui.vercel.app/r/ai-input/ai-input-01.json
+```
+
+</Tabs>
+
+Then, add to your page and it works!
+
+```jsx
+import AIInput01 from "@/components/ghostui/ai-input/ai-input-01";
+
+export default function Page() {
+    return <AIInput01 />;
+}
+```
+
+### 4. Optional dependencies
+
+Some components require additional libraries, listed at the bottom of each component. Make sure to install them to ensure the component works properly.
+
+### 5. Monorepo
+
+For monorepo `shadcn/ui` CLI contain the options `-c` to the path to your workspace for example:
+
+<Tabs items={["bun", "npx", "pnpm"]}>
+ 
+```bash tab="bun"
+bunx shadcn@latest add https://ghostui.vercel.app/r/buttons/btn-01.json -c ./apps/www
+```
+ 
+```bash tab="npx"
+npx shadcn@latest add https://ghostui.vercel.app/r/buttons/btn-01.json -c ./apps/www
+```
+
+```bash tab="pnpm"
+pnpm dlx shadcn@latest add https://ghostui.vercel.app/r/buttons/btn-01.json -c ./apps/www
+```
+
+</Tabs>

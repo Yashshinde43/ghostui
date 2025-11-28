@@ -8,8 +8,9 @@ import {
 import { notFound } from 'next/navigation';
 
 import defaultMdxComponents from 'fumadocs-ui/mdx';
-import { Preview } from '@/commponents/mdx/preview';
-import { PreviewClient } from '@/components/mdx/preview-client';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { Preview } from '@/components/mdx/preview';
+import PreviewClient  from '@/components/mdx/preview-client';
 
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
@@ -27,10 +28,15 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
         <MDX
-          components={getMDXComponents({
-            // this allows you to link to other pages with relative file paths
-            a: createRelativeLink(source, page),
-          })}
+          components={
+            {
+              ...defaultMdxComponents,
+              Tab,
+              Tabs,
+              Preview,
+              PreviewClient,
+            }
+          }
         />
       </DocsBody>
     </DocsPage>

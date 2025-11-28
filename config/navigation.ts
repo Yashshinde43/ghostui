@@ -4,9 +4,9 @@ export interface NavItem {
     href: string,
     description?: string,
     count?: number | string,
-    isComminSoon?: boolean,
+    isComingSoon?: boolean,
     isNew?: boolean,
-    isLabel?: boolean,
+    isLab?: boolean,
 }
 
 export interface NavSection {

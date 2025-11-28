@@ -36,13 +36,15 @@ export default function Hero() {
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-start">
             <button className="group relative inline-flex items-center justify-center overflow-hidden rounded-full border border-red-500/70 bg-gradient-to-r from-red-600 via-red-500 to-red-400 px-7 py-2.5 text-xs font-semibold uppercase tracking-[0.28em] text-black shadow-[0_0_35px_rgba(248,113,113,0.8)]">
               <Link href='/components'>
-              <span className="absolute inset-0 bg-[radial-gradient(circle_at_0%_50%,rgba(255,255,255,0.9),transparent_60%)] opacity-0 transition group-hover:opacity-100" />
-              <span className="relative">Browse Components</span>
+                <span className="absolute inset-0 bg-[radial-gradient(circle_at_0%_50%,rgba(255,255,255,0.9),transparent_60%)] opacity-0 transition group-hover:opacity-100" />
+                <span className="relative">Browse Components</span>
               </Link>
             </button>
             <button className="relative inline-flex items-center gap-2 rounded-full border border-neutral-700/80 bg-black/50 px-5 py-2 text-[11px] font-medium uppercase tracking-[0.26em] text-neutral-200 backdrop-blur transition hover:border-red-400/60 hover:text-white">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500 shadow-[0_0_14px_rgba(248,113,113,0.9)]" />
-              Live Playground
+              <Link href='/docs'>
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500 shadow-[0_0_14px_rgba(248,113,113,0.9)]" />
+                Documentation
+              </Link>
             </button>
           </div>
 

@@ -1,233 +1,77 @@
 'use client'
-import React, { RefObject, useActionState, useEffect, useRef, useState, useTransition } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
-import { copyComponent } from '@/lib/action';
-import { cn } from '@/lib/utils';
-import { ArrowUpRight, CheckCheck, Copy, Terminal } from 'lucide-react';
-import { Button } from '../ui/button';
-const previewClient = ({ link, prePath, isBlock = false }: { link: string, prePath: string, isBlock?: boolean }) => {
-  const [state, formAction] = useActionState(copyComponent, {
-    error: '',
-    content: '',
-    success: false
-  });
-  const [isPending, startTransition] = useTransition()
-  const [showLoginDialog, setShowLoginDialog] = useState(false)
-  const [isCopied, setIsCopied] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
-  const [isTerminalCopied, setIsTerminalCopied] = useState(false)
+import React from 'react';
+import { cn } from "@/lib/utils";
+import PreviewContent from "./preview-content";
 
-  const handleCopyClick = async () => {
-    const [folder, filename] = link.split('/');
-    startTransition(async () => {
-      const formData = new FormData()
-      formData.append('folder', folder);
-      formData.append('filename', filename);
-      formAction(formData)
-    })
-  }
-
-  const getFileName = () => {
-    const [folder, filename] = link.split('/');
-    return `${folder}/${filename}`
-  }
-
-  const handleTerminalClick = () => {
-    const [folder, filename] = getFileName().split('/');
-    const COPY = `npmx shadcn @latest add ${prePath}/r/${folder}/${filename ? filename : folder}`;
-    navigator.clipboard.writeText(COPY);
-    setIsTerminalCopied(true);
-    setTimeout(() => {
-      setIsTerminalCopied(false);
-    }, 2000);
-  }
-
-  const openInV0 = () => {
-    const [folder, filename] = link.split('/');
-    return filename ? filename : folder;
-  }
-
-  useEffect(() => {
-    if (state.error) {
-      setShowLoginDialog(true)
-    }
-    if (state.success && state.content) {
-      setIsCopied(true)
-      navigator.clipboard.writeText(state.content);
-      setTimeout(() => {
-        setIsCopied(false)
-      }, 2000)
-    }
-  }, [state]);
-
-  function SuccessParticles({
-    buttonRef,
-  }: {
-    buttonRef: React.RefObject<HTMLButtonElement>;
-  }) {
-    const rect = buttonRef.current?.getBoundingClientRect();
-    if (!rect) return null;
-
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    return (
-      <AnimatePresence>
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="fixed w-1 h-1 bg-black dark:bg-white rounded-full"
-            style={{ left: centerX, top: centerY }}
-            initial={{
-              scale: 0,
-              x: 0,
-              y: 0,
-            }}
-            animate={{
-              scale: [0, 1, 0],
-              x: [
-                0,
-                (i % 2 ? 1 : -1) * (Math.random() * 50 + 20),
-              ],
-              y: [0, -Math.random() * 50 - 20],
-            }}
-            transition={{
-              duration: 0.6,
-              delay: i * 0.1,
-              ease: "easeOut",
-            }}
-          />
-        ))}
-      </AnimatePresence>
-    );
-  }
-  const terminalButtonRef = useRef<HTMLButtonElement>(null);
-  const copyButtonRef = useRef<HTMLButtonElement>(null);
-
-  return (
-    <>
-      {isTerminalCopied && (
-        <SuccessParticles
-          buttonRef={terminalButtonRef as RefObject<HTMLButtonElement>}
-        />
-      )}
-      {isCopied && (
-        <SuccessParticles
-          buttonRef={copyButtonRef as RefObject<HTMLButtonElement>}
-        />
-      )}
-
-      <div
-        className={cn("relative mt-4", "rounded-xl p-3")}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <a
-            href={`${prePath}/preview/${link}`}
-            target="_blank"
-            rel="noreferrer"
-            className={cn(
-              "flex items-center gap-2",
-              "text-sm font-medium",
-              "text-zinc-800 dark:text-zinc-200",
-              "hover:text-zinc-600 dark:hover:text-zinc-400",
-              "transition-all duration-200 no-underline group"
-            )}
-          >
-            Live Preview
-            <ArrowUpRight
-              className={cn(
-                "h-4 w-4",
-                "transition-transform duration-200 group-hover:rotate-12"
-              )}
-            />
-          </a>
-
-          <div className="flex items-center gap-2">
-            {/* <OpenInV0Button name={openInV0()} /> */}
-            <Button
-              ref={terminalButtonRef}
-              onClick={handleTerminalClick}
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "relative overflow-hidden",
-                "h-7 px-3 text-xs font-medium",
-                "bg-black dark:bg-white",
-                "text-white dark:text-black",
-                "hover:bg-black/90 dark:hover:bg-white/90",
-                "hover:text-white dark:hover:text-black",
-                "transition-all duration-200",
-                "group flex items-center gap-1",
-                "rounded-lg",
-                "shadow-none"
-              )}
-            >
-              {isTerminalCopied ? (
-                <>
-                  <CheckCheck className="h-3.5 w-3.5 text-white dark:text-black" />
-                </>
-              ) : (
-                <Terminal
-                  className={cn(
-                    "h-3.5 w-3.5",
-                    "transition-all duration-200",
-                    "group-hover:rotate-12"
-                  )}
-                />
-              )}
-              <span>npx shadcn add {getFileName()}</span>
-            </Button>
-
-            {!isBlock && (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleCopyClick();
-                }}
-              >
-                <Button
-                  ref={copyButtonRef}
-                  type="submit"
-                  variant="ghost"
-                  size="sm"
-                  disabled={isPending}
-                  className={cn(
-                    "relative overflow-hidden",
-                    "h-7 px-3 text-xs font-medium",
-                    "bg-black dark:bg-white",
-                    "text-white dark:text-black",
-                    "hover:bg-black/90 dark:hover:bg-white/90",
-                    "hover:text-white dark:hover:text-black",
-                    "transition-all duration-200",
-                    "group flex items-center gap-1",
-                    "rounded-lg",
-                    "shadow-none"
-                  )}
-                >
-                  {isCopied ? (
-                    <>
-                      <CheckCheck className="h-3.5 w-3.5 text-white dark:text-black" />
-                    </>
-                  ) : (
-                    <Copy
-                      className={cn(
-                        "h-3.5 w-3.5",
-                        "transition-all duration-200",
-                        "group-hover:rotate-12"
-                      )}
-                    />
-                  )}
-                  <span>Copy</span>
-                </Button>
-              </form>
-            )}
-          </div>
-        </div>
-      </div>
-    </>
-  )
+interface PreviewProps {
+  children: React.ReactNode;
+  className?: string;
+  isPremium?: boolean;
+  link: string;
+  useIframe?: boolean;
+  height?: string;
+  compact?: boolean;
+  comment?: string[];
+  isBlock?: boolean;
 }
 
-export default previewClient
+const prePath = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "https://ghostui.vercel.app";
+
+export function Preview({
+  children,
+  className = "",
+  link,
+  useIframe = false,
+  compact = false,
+  comment = [],
+  isBlock = false,
+}: PreviewProps) {
+  console.log(prePath + link);
+  return (
+    <>
+      <div className={cn("w-full overflow-hidden", className)}>
+        <PreviewContent link={link} prePath={prePath} isBlock={isBlock} />
+
+        {useIframe ? (
+          <div className="w-full my-4 border rounded-2xl border-zinc-400 dark:border-zinc-700">
+            <div className="relative w-full h-[100dvh] overflow-hidden">
+              <iframe
+                title={link}
+                src={`${prePath}/preview/${link}`}
+                className="w-full h-full overflow-y-auto list-none"
+                style={{
+                  border: "none",
+                  transform: "scale(0.95)",
+                }}
+              />
+            </div>
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "p-2 md:p-8 flex justify-center items-center relative border rounded-2xl my-4 border-zinc-400 dark:border-zinc-800 not-prose",
+              compact ? "min-h-[100px]" : "min-h-[400px]",
+              isBlock ? "md:p-0" : ""
+            )}
+          >
+            {children}
+          </div>
+        )}
+        {comment.length > 0 && (
+          <div className="flex flex-wrap gap-3 mt-6">
+            {comment.map((text, index) => (
+              <div
+                key={index}
+                className="px-4 py-2 text-sm font-medium bg-purple-100 dark:bg-purple-950/30 rounded-lg text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/50 shadow-xs hover:bg-purple-200/70 dark:hover:bg-purple-950/50 transition-colors"
+              >
+                {text}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}

@@ -26,21 +26,11 @@ export default function Navbar() {
             </Link>
           </button>
           <button className="relative uppercase transition hover:text-white">
-            <Link href="/pricings">
-              <span className="relative z-10">Pricing</span>
-            </Link>
-          </button>
-          <button className="relative uppercase transition hover:text-white">
             <Link href="/docs">
               <span className="relative z-10">Docs</span>
             </Link>
           </button>
         </nav>
-
-        <button className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-red-500/70 bg-gradient-to-r from-red-600 via-red-500 to-red-400 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.26em] text-black shadow-[0_0_30px_rgba(248,113,113,0.8)]">
-          <span className="absolute inset-0 -translate-x-full bg-[radial-gradient(circle_at_0%_50%,rgba(255,255,255,0.9),transparent_55%)] transition-transform duration-500 group-hover:translate-x-0" />
-          <span className="relative">Launch Console</span>
-        </button>
       </div>
     </header>
   );

@@ -13,10 +13,10 @@ export default function Alert01() {
 
                     <div className="space-y-0.5">
                         <h3 className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                            CodeSnippet UI
+                            Ghost UI
                         </h3>
                         <p className="text-[13px] text-zinc-500 dark:text-zinc-400">
-                            Use the CLI to install this!
+                            Use the CLI to install this component!
                         </p>
                     </div>
                 </div>

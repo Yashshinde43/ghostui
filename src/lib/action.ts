@@ -1,3 +1,4 @@
+'use server';
 import path from 'path';
 import { cache } from 'react';
 import { promises as fs } from 'fs';
@@ -23,7 +24,7 @@ export type copyComponentState = {
     success: boolean;
 }
 
-export const copyComponent = async (prevState: copyComponentState, formData: FormData) => {
+export const copyComponent = async (prevState: copyComponentState | undefined, formData: FormData): Promise<copyComponentState> => {
     try {
         const folder = formData.get('folder') as string;
         const filename = formData.get('filename') as string;
@@ -50,7 +51,12 @@ export const copyComponent = async (prevState: copyComponentState, formData: For
             success: true
         }
     } catch (error) {
-
+        console.log(error);
+        return {
+            error: 'An error occurred',
+            content: '',
+            success: false
+        }
     }
 
 }
