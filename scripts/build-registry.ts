@@ -28,36 +28,33 @@ async function writeFileRecursive(filePath: string, data: string) {
 }
 
 /**
- * Converts @/ imports to relative paths based on file location
+ * Converts @/ imports to relative paths based on TARGET file location
  * @param content - The file content with @/ imports
- * @param filePath - The normalized file path (e.g., "/src/components/ghostui/ai-input/ai-input-02.tsx")
+ * @param sourcePath - The source file path (e.g., "/src/components/ghostui/ai-input/ai-input-02.tsx")
+ * @param targetPath - The target file path where it will be installed (e.g., "/components/ghostui/ai-input-02.tsx")
  * @returns Content with @/ imports replaced with relative paths
  */
-function convertImportsToRelative(content: string, filePath: string): string {
-    // Normalize path: remove leading/trailing slashes and split
-    const pathParts = filePath.split('/').filter(Boolean);
+function convertImportsToRelative(content: string, sourcePath: string, targetPath: string): string {
+    // Use target path to calculate relative imports (where the file will be installed)
+    const pathParts = targetPath.split('/').filter(Boolean);
     const srcIndex = pathParts.indexOf('src');
     
-    // If no 'src' found, return content as-is
-    if (srcIndex === -1) return content;
-    
-    // Calculate depth: number of directories from file to 'src' directory
-    // Example: /src/components/ghostui/ai-input/ai-input-02.tsx
-    // pathParts: ['src', 'components', 'ghostui', 'ai-input', 'ai-input-02.tsx']
-    // srcIndex: 0, depth = pathParts.length - srcIndex - 2 = 5 - 0 - 2 = 3
-    // So we need 3 levels up: ../../../ to get to src root
-    const depth = pathParts.length - srcIndex - 2; // -2 for 'src' itself and the filename
+    // If no 'src' found, try without 'src' prefix (target might be "/components/ghostui/...")
+    let depth: number;
+    if (srcIndex === -1) {
+        // Target is like "/components/ghostui/ai-input-02.tsx"
+        // We need to go up to src level, so depth = pathParts.length - 1 (excluding filename)
+        depth = pathParts.length - 1;
+    } else {
+        // Target is like "/src/components/ghostui/ai-input-02.tsx"
+        depth = pathParts.length - srcIndex - 2; // -2 for 'src' itself and the filename
+    }
     
     if (depth < 0) return content;
     
     const relativePrefix = '../'.repeat(depth);
     
     // Replace @/ imports in various formats
-    // Match patterns like:
-    // - import ... from "@/path/to/file"
-    // - import "@/path/to/file"
-    // - from "@/path/to/file"
-    // - require("@/path/to/file")
     return content.replace(
         /(["'])@\/([^"']+)(["'])/g,
         (match, quote1, importPath, quote2) => {
@@ -78,16 +75,17 @@ const getComponentFiles = async (files: File[], registryType: string) => {
             const filePath = path.join(REGISTRY_BASE_PATH, normalizedPath);
             let fileContent = await fs.readFile(filePath, "utf-8");
             
-            // Convert @/ imports to relative paths
-            fileContent = convertImportsToRelative(fileContent, normalizedPath);
-            
             const fileName = normalizedPath.split('/').pop() || '';
+            const targetPath = `/components/ghostui/${fileName}`;
+            
+            // Convert @/ imports to relative paths based on TARGET location
+            fileContent = convertImportsToRelative(fileContent, normalizedPath, targetPath);
             
             return {
                 type: registryType,
                 content: fileContent,
                 path: normalizedPath,
-                target: `/components/ghostui/${fileName}`,
+                target: targetPath,
             };
         }
         const normalizedPath = file.path.startsWith("/")
@@ -95,9 +93,6 @@ const getComponentFiles = async (files: File[], registryType: string) => {
             : `/${file.path}`;
         const filePath = path.join(REGISTRY_BASE_PATH, normalizedPath);
         let fileContent = await fs.readFile(filePath, "utf-8");
-        
-        // Convert @/ imports to relative paths
-        fileContent = convertImportsToRelative(fileContent, normalizedPath);
         
         const fileName = normalizedPath.split('/').pop() || '';
         
@@ -114,13 +109,19 @@ const getComponentFiles = async (files: File[], registryType: string) => {
             }
         };
         
+
+        
         const fileType = typeof file === 'string' ? registryType : (file.type || registryType);
+        const targetPath = typeof file === 'string' ? getTargetPath(registryType) : (file.target || getTargetPath(fileType));
+        
+        // Convert @/ imports to relative paths based on TARGET location
+        fileContent = convertImportsToRelative(fileContent, normalizedPath, targetPath);
         
         return {
             type: fileType,
             content: fileContent,
             path: normalizedPath,
-            target: typeof file === 'string' ? getTargetPath(registryType) : (file.target || getTargetPath(fileType)),
+            target: targetPath,
         };
     });
 
