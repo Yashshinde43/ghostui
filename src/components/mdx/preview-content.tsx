@@ -31,7 +31,7 @@ const previewClient = ({ link, prePath, isBlock = false }: { link: string, prePa
 
   const handleTerminalClick = () => {
     const [folder, filename] = getFileName().split('/');
-    const COPY = `npmx shadcn @latest add ${prePath}/r/${folder}/${filename ? filename : folder}`;
+    const COPY = `npx shadcn@latest add ${prePath}/r/${folder}/${filename ? filename : folder}`;
     navigator.clipboard.writeText(COPY);
     setIsTerminalCopied(true);
     setTimeout(() => {

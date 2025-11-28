@@ -15,9 +15,9 @@ interface PreviewProps {
   isBlock?: boolean;
 }
 
-const prePath = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : "https://ghostui.vercel.app";
+const prePath = process.env.NEXT_PUBLIC_VERCEL_URL || process.env.VERCEL_URL
+  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL || process.env.VERCEL_URL}`
+  : "https://ghostui-seven.vercel.app";
 
 export function Preview({
   children,
